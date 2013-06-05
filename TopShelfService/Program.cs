@@ -1,13 +1,14 @@
-﻿using Topshelf;
-
-namespace ConsoleApplication1
+﻿using System.Reflection;
+using Topshelf;
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "Log4Net.config", Watch = true)]
+namespace TopShelfService
 {
     class Program
     {
         static void Main()
         {
-            //HostFactory.New(x => x.StartAutomatically());
-
+            log4net.ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+            logger.Info("Starting");
             HostFactory.Run(x =>
                                 {
                                     x.Service<TownCrier> (s =>
@@ -20,6 +21,7 @@ namespace ConsoleApplication1
                                     x.SetDescription("Sample Topshelf Host");
                                     x.SetDisplayName("Stuff");
                                     x.SetServiceName("Stuff");
+                                    x.UseLog4Net();
                                 });
         }
     }
