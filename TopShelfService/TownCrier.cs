@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,11 +13,26 @@ namespace TopShelfService
     public class TownCrier
     {
         private readonly Timer _timer;
-        private log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly string _crierFrequencyConfig = ConfigurationManager.AppSettings.Get("CrierFrequency");
+        private readonly int _crierFrequency ;
 
         public TownCrier()
         {
-            _timer = new Timer(1000) {AutoReset = true};
+
+            if (null != _crierFrequencyConfig)
+            {
+                _log.Info("CrierFrequency Configured as " + _crierFrequencyConfig);
+                _crierFrequency = Convert.ToInt32(_crierFrequencyConfig)*1000;
+            }
+            else
+            {
+                _log.Info("CrierFrequency Was Not Configured.  Default Value Of 1 Is Used.");
+                _crierFrequency = 1000;
+            }
+
+
+            _timer = new Timer(_crierFrequency) {AutoReset = true};
             _timer.Elapsed += (sender, eventArgs) => _log.Info("It is " + DateTime.Now.ToString() + " and all is well");
         }
 
