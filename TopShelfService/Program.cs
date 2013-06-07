@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Topshelf;
+
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "Log4Net.config", Watch = true)]
 namespace TopShelfService
 {

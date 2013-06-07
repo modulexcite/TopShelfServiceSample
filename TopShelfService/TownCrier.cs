@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,28 +13,24 @@ namespace TopShelfService
 {
     public class TownCrier
     {
-        private readonly Timer _timer;
-        private readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType); 
         private readonly string _crierFrequencyConfig = ConfigurationManager.AppSettings.Get("CrierFrequency");
-        private readonly int _crierFrequency ;
+        private readonly double _crierFrequency;
+        private readonly Timer _timer;
 
         public TownCrier()
         {
-
-            if (null != _crierFrequencyConfig)
-            {
-                _log.Info("CrierFrequency Configured as " + _crierFrequencyConfig);
-                _crierFrequency = Convert.ToInt32(_crierFrequencyConfig)*1000;
-            }
+            if (Double.TryParse(_crierFrequencyConfig, out _crierFrequency))
+                _log.Info("CrierFrequency Configured as " + _crierFrequency.ToString(CultureInfo.InvariantCulture) + " Seconds");
             else
             {
-                _log.Info("CrierFrequency Was Not Configured.  Default Value Of 1 Is Used.");
-                _crierFrequency = 1000;
+                _log.Info("CrierFrequency Was Not Configured Correctly.  Default Value Of 1 Second Is Being Used.");
+                _crierFrequency = 1;
             }
 
-
-            _timer = new Timer(_crierFrequency) {AutoReset = true};
-            _timer.Elapsed += (sender, eventArgs) => _log.Info("It is " + DateTime.Now.ToString() + " and all is well");
+            _timer = new Timer(_crierFrequency*1000) {AutoReset = true};
+            _timer.Elapsed += (sender, eventArgs) => _log.Info("It is " + 
+                DateTime.Now.ToString(CultureInfo.InvariantCulture) + " and all is well");
         }
 
         public void Start() {_timer.Start(); }
