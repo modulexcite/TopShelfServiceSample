@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Topshelf;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "Log4Net.config", Watch = true)]
@@ -12,16 +13,16 @@ namespace TopShelfService
             logger.Info("Starting");
             HostFactory.Run(x =>
                                 {
-                                    x.Service<TownCrier> (s =>
+                                    x.Service<HttpApiService> (s =>
                                         {
-                                            s.ConstructUsing(name => new TownCrier());
+                                            s.ConstructUsing(name => new HttpApiService());
                                             s.WhenStarted(tc => tc.Start());
                                             s.WhenStopped(tc => tc.Stop());
                                         });
                                     x.RunAsLocalSystem();
-                                    x.SetDescription("Sample Topshelf Host");
-                                    x.SetDisplayName("Stuff");
-                                    x.SetServiceName("Stuff");
+                                    x.SetDescription("Sample Web API Hosted By Topshelf");
+                                    x.SetDisplayName("WebApiHostedByTopshelf");
+                                    x.SetServiceName("WebApiHostedByTopshelf");
                                     x.UseLog4Net();
                                 });
         }
